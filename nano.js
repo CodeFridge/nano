@@ -383,6 +383,28 @@ module.exports = exports = nano = function database_module(cfg) {
     }
 
    /*
+    * gets the head of a document
+    *
+    * e.g. db2.get("foo", {revs_info: true}, function (e,b,h) {
+    *        console.log(e,b,h);
+    *        return;
+    *      });
+    *
+    * @param {doc_name:string} document name
+    * @param {params:object:optional} additions to the querystring
+    *
+    * @see relax
+    */
+    function check_doc(doc_name,params,callback) {
+      if(typeof params === "function") {
+        callback = params;
+        params   = {};
+      }
+      return relax({db: db_name, doc: doc_name, method: "HEAD", params: params},callback);
+    }
+
+
+   /*
     * lists all the documents in a couchdb database
     *
     * @param {params:object:optional} additions to the querystring
@@ -570,6 +592,7 @@ module.exports = exports = nano = function database_module(cfg) {
                          }
                        , insert: insert_doc
                        , get: get_doc
+                       , check: check_doc
                        , destroy: destroy_doc
                        , bulk: bulk_docs
                        , list: list_docs
