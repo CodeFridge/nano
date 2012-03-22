@@ -309,13 +309,15 @@ module.exports = exports = nano = function database_module(cfg) {
   *
   * @see relax
   */
-  function replicate_db(source, target, continuous, callback) {
-    if(typeof continuous === "function") {
-      callback   = continuous;
-      continuous = false;
+  function replicate_db(source, target, params, callback) {
+    if(typeof params === "function") {
+      callback   = params;
     }
     var body = {source: source, target: target};
-    if(continuous) { body.continuous = true; }
+    Object.keys(params).forEach(function(key){
+      body[key] = params[key];
+    });
+
     return relax({db: "_replicate", body: body, method: "POST"},callback);
   }
 
@@ -577,12 +579,11 @@ module.exports = exports = nano = function database_module(cfg) {
     }
 
     public_functions = { info: function(cb) { return get_db(db_name,cb); }
-                       , replicate: function(target,continuous,cb) {
-                           if(typeof continuous === "function") {
-                             cb         = continuous;
-                             continuous = false;
+                       , replicate: function(target,params,cb) {
+                           if(typeof params === "function") {
+                             cb = params;
                            }
-                           return replicate_db(db_name,target,continuous,cb);
+                           return replicate_db(db_name,target,params,cb);
                          }
                        , compact: function(cb) { 
                            return compact_db(db_name,cb); 
