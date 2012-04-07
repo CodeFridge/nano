@@ -94,6 +94,12 @@ module.exports = exports = nano = function database_module(cfg) {
       , parsed
       , rh
       ;
+      
+    if (opts.headers){ 
+      for(header in opts.headers){
+        headers[header] = opts.headers[header]
+      }
+    }
 
     if (opts.jar) { req.jar = opts.jar; }
     if(opts.db) { req.uri += "/" + opts.db; }
@@ -369,6 +375,23 @@ module.exports = exports = nano = function database_module(cfg) {
         callback);
     }
 
+    /*
+    * copy a document from a couchdb database
+    *
+    * @param {doc_name:string} document name
+    * @param {rev:string} previous document revision
+    *
+    * @see relax
+    */
+    function copy_doc(doc_name,new_name,rev,callback) {
+      headers = {};
+      headers["Destination"] = new_name;
+      if (rev != null){headers["Destination"] += "?rev=" +rev;}
+      return relax({db: db_name, doc: doc_name, method: "COPY", headers:headers},
+        callback);
+    }
+
+
    /*
     * get a document from a couchdb database
     *
@@ -601,6 +624,7 @@ module.exports = exports = nano = function database_module(cfg) {
                        , get: get_doc
                        , check: check_doc
                        , destroy: destroy_doc
+                       , copy: copy_doc
                        , bulk: bulk_docs
                        , list: list_docs
                        , fetch: fetch_docs
